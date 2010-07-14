@@ -1,6 +1,4 @@
 ledger
-accounts show --full
-accounts show where:level=1
 
 [accounts]
   +--- [income]		 
