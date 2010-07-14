@@ -1,0 +1,36 @@
+ledger
+accounts show --full
+accounts show where:level=1
+
+[accounts]
+  +--- [income]		 
+		 +--- [cash] (16687 subaccounts)
+		 +--- [alfa] 300
+				+--- [9096405629] 700
+			    +--- [9096405666] -400
+		 +--- [avangard]
+		 +--- [mobile]
+		 +--- [internet]
+  +--- [expenses]
+  
+  +--- [external]
+  
+SYNTAX:
+-- TRANSACTION [{transaction-note}] FROM [{account-from}] TO [{account-to}] AT [{date}] SUM [{sum}] 
+ 
+$set default-from to [external.income]
+ok
+
+$show settings
+-- confirm : True
+-- verbose : True
+-- default-from : [expenses.not-detailed]
+-- default-to : [expenses.not-detailed]
+
+$make-tran from:cash sum 500
+~~ transaction from [cash] to [expenses.not-detailed] at [..today..] sum [500]
+~~ [cash]: +500, balance 5344
+~~ [external.income]: doesn't exist, creating
+~~ [external.income]: -500, balance -500
+~~ do (y/n)? y
+ok
