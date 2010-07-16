@@ -12,7 +12,9 @@ ledger
   +--- [expenses]
   
   +--- [external]
-  
+ 
+======================================
+
 SYNTAX:
 -- TRANSACTION [{transaction-note}] FROM [{account-from}] TO [{account-to}] AT [{date}] SUM [{sum}] 
  
@@ -25,10 +27,19 @@ $show settings
 -- default-from : [expenses.not-detailed]
 -- default-to : [expenses.not-detailed]
 
-$make-tran from:cash sum 500
+$transaction from cash to mobile sum 300
+$make-tran from:cash sum:500
 ~~ transaction from [cash] to [expenses.not-detailed] at [..today..] sum [500]
 ~~ [cash]: +500, balance 5344
 ~~ [external.income]: doesn't exist, creating
 ~~ [external.income]: -500, balance -500
 ~~ do (y/n)? y
 ok
+
+======================
+ACCOUNTS:
+[ id | name | created_at | trans_id | parent-id? | balance | ct_turnover | dt_turnover ]
+
+TRANSACTION:
+[ id | name | created_at | from_account | to_account | sum | executed ]
+
