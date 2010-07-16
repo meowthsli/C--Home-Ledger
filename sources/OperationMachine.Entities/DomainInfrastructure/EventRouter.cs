@@ -46,11 +46,4 @@ namespace Meowth.OperationMachine.Domain.DomainInfrastructure
             }
         }
     }
-
-    public class RouteNotRegisteredException : Exception
-    {
-        public RouteNotRegisteredException(Type t)
-        {
-        }
-    }
 }

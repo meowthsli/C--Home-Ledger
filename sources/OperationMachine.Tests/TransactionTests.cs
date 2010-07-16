@@ -93,5 +93,12 @@ namespace Meowth.OperationMachine.Tests
             tx.Execute();
             Assert.Throws<InvalidOperationException>(tx.Execute);
         }
+
+        [Test]
+        public void WhenAccountsAreEqualThenExceptionIsGenerated()
+        {
+            var acc = new Account("root");
+            Assert.Throws<InvalidOperationException>(() => new Transaction("tx", acc, acc, 0.0m));
+        }
     }
 }

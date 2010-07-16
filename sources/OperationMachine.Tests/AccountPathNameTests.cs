@@ -42,5 +42,16 @@ namespace Meowth.OperationMachine.Tests
             Assert.AreEqual(str2, comps[1]);
             Assert.AreEqual(str1 + "." + str2, acc.ToString());
         }
+
+        [Test]
+        public void TestEquals()
+        {
+            const string str1 = "ex";
+
+            AccountPathName apn = AccountPathName.FromString(str1);
+            Assert.IsFalse(apn.Equals(null));
+            Assert.IsFalse(apn.Equals(str1));
+            Assert.AreNotEqual(0, apn.GetHashCode());
+        }
     }
 }

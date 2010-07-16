@@ -27,11 +27,6 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
             Publish(new EntityLifecycleEvent<Account>(this, EntityLifecyclePhase.Created));
         }
 
-        protected Account()
-        {
-            // Publish(new AccountLifecycleEvent(this, EntityLifecycle.Created, false));
-        }
-
         #region properties
 
         /// <summary> Identity </summary>

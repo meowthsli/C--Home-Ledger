@@ -49,7 +49,7 @@ namespace Meowth.OperationMachine.Domain.Accounts
         /// <summary> Creates from components </summary>
         private AccountPathName(string[] components)
         {
-            _asString = string.Join(SEPARATOR, components);
+            Path = string.Join(SEPARATOR, components);
         }
 
         public override int GetHashCode()
