@@ -77,9 +77,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OperationMachine.Entities\OperationMachine.Entities.csproj">
+    <ProjectReference Include="..\OperationMachine.Entities\OperationMachine.Domain.csproj">
       <Project>{9345F5ED-3D34-4E68-BAE4-0C8DFD5806A9}</Project>
-      <Name>OperationMachine.Entities</Name>
+      <Name>OperationMachine.Domain</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

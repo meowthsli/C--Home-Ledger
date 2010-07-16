@@ -95,11 +95,12 @@
     <Compile Include="AccountTests.cs" />
     <Compile Include="DomainTestFixtureBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransactionTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OperationMachine.Entities\OperationMachine.Entities.csproj">
+    <ProjectReference Include="..\OperationMachine.Entities\OperationMachine.Domain.csproj">
       <Project>{9345F5ED-3D34-4E68-BAE4-0C8DFD5806A9}</Project>
-      <Name>OperationMachine.Entities</Name>
+      <Name>OperationMachine.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\OperationMachine\OperationMachine.csproj">
       <Project>{30D75416-4A06-435D-B14C-41DEF5A8CE60}</Project>

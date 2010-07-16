@@ -1,6 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
-using Meowth.OperationMachine.Entities.Accounts;
+using Meowth.OperationMachine.Domain.Accounts;
 
 namespace Meowth.OperationMachine.Tests
 {

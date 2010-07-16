@@ -2,8 +2,9 @@
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
-using Meowth.OperationMachine.Entities.Accounts;
-using Meowth.OperationMachine.Entities;
+using Meowth.OperationMachine.Domain.Accounts;
+using Meowth.OperationMachine.Domain;
+using Meowth.OperationMachine.Domain.Entities.Accounts;
 using NHibernate;
 using System.Collections.Generic;
 
@@ -19,7 +20,7 @@ namespace Meowth.OperationMachine
                .Mappings(m => m.AutoMappings.Add(AutoMap
                    .AssemblyOf<Account>()
                    .Override<Account>(a => a.IgnoreProperty(x => x.Turnover))
-                   .Override<Account>(a => a.IgnoreProperty(x => x.Saldo))))
+                   .Override<Account>(a => a.IgnoreProperty(x => x.Balance))))
                .Database(SQLiteConfiguration.Standard
                    .ConnectionString("Data Source=:memory:;Version=3;BinaryGUID=False;New=True;")
                    .Driver("NHibernate.Driver.SQLite20Driver")
@@ -39,7 +40,7 @@ namespace Meowth.OperationMachine
 
         private void Initialize(ISession session)
         {
-            var acc = new Account("root", 0.0m);
+            var acc = new Account("root");
             session.Save(acc);
         }
 

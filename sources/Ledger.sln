@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperationMachine.Entities", "OperationMachine.Entities\OperationMachine.Entities.csproj", "{9345F5ED-3D34-4E68-BAE4-0C8DFD5806A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperationMachine.Domain", "OperationMachine.Entities\OperationMachine.Domain.csproj", "{9345F5ED-3D34-4E68-BAE4-0C8DFD5806A9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperationMachine.Tests", "OperationMachine.Tests\OperationMachine.Tests.csproj", "{834F25B1-0F85-4258-B9AA-DEA696A8FD3F}"
 EndProject
