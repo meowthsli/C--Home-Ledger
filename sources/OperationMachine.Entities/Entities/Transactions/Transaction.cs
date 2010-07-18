@@ -6,7 +6,7 @@ using Meowth.OperationMachine.Domain.Events.Transactions;
 namespace Meowth.OperationMachine.Domain.Entities.Transactions
 {
     /// <summary>
-    /// Transaction class
+    /// Accounting transaction class
     /// </summary>
     public class Transaction
         : DomainEntity
@@ -22,7 +22,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Transactions
             Amount = amount;
             // TODO: date
 
-            Publish(new EntityLifecycleEvent<Transaction>(this, EntityLifecyclePhase.Created));
+            Publish(new EntityCreatedEvent<Transaction>(this));
         }
 
         public virtual Guid Id { get; protected set; }

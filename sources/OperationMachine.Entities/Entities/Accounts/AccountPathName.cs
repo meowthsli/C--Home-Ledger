@@ -4,7 +4,7 @@ using System;
 namespace Meowth.OperationMachine.Domain.Accounts
 {
     /// <summary>
-    /// Path to account
+    /// Path to account in a way like "root.subroot.subsubroot" and so on..
     /// </summary>
     public class AccountPathName
     {

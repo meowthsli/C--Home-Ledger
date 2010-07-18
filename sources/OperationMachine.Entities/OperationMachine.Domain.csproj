@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainInfrastructure\IDomainEventBus.cs" />
-    <Compile Include="DomainInfrastructure\EventRouter.cs" />
+    <Compile Include="DomainInfrastructure\DomainEventBus.cs" />
     <Compile Include="DomainInfrastructure\Repository\IAccountRepository.cs" />
     <Compile Include="Entities\Accounts\Account.cs" />
     <Compile Include="Entities\Accounts\AccountPathName.cs" />
@@ -57,8 +57,7 @@
     <Compile Include="Events\Accounts\TurnoverEvent.cs" />
     <Compile Include="Events\Accounts\TurnoverType.cs" />
     <Compile Include="Events\DomainEvent[T].cs" />
-    <Compile Include="Events\EntityLifecycleEvent.cs" />
-    <Compile Include="Events\EntityLifecyclePhase.cs" />
+    <Compile Include="Events\EntityCreatedEvent.cs" />
     <Compile Include="Events\IAnyDomainEvent.cs" />
     <Compile Include="Events\Transactions\TransactionExecutedEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

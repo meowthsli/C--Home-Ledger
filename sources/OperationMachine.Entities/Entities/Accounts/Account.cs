@@ -15,7 +15,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
             Name = accountName;
             PathName = AccountPathName.FromString(accountName);
 
-            Publish(new EntityLifecycleEvent<Account>(this, EntityLifecyclePhase.Created));
+            Publish(new EntityCreatedEvent<Account>(this));
         }
 
         public Account(string accountName, Account parent)
@@ -24,7 +24,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
             PathName = AccountPathName.FromParentNameAndString(parent.PathName, accountName);
             Parent = parent;
 
-            Publish(new EntityLifecycleEvent<Account>(this, EntityLifecyclePhase.Created));
+            Publish(new EntityCreatedEvent<Account>(this));
         }
 
         /// <summary>

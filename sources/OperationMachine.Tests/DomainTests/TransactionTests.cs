@@ -14,16 +14,15 @@ namespace Meowth.OperationMachine.Tests
         [Test]
         public void WhenTransactionCreatedThenEventGenerated()
         {
-            EntityLifecycleEvent<Transaction> @event = null;
+            EntityCreatedEvent<Transaction> @event = null;
             Container.Resolve<IDomainEventBus>()
-                .RegisterThreaded<EntityLifecycleEvent<Transaction>>(e => { @event = e; });
+                .RegisterThreaded<EntityCreatedEvent<Transaction>>(e => { @event = e; });
             
             var tx = new Transaction("tx1", 
                 new Account("acc1"), 
                 new Account("acc2"), 0.0m);
             Assert.IsNotNull(@event);
             Assert.AreEqual(tx, @event.Subject);
-            Assert.AreEqual(EntityLifecyclePhase.Created, @event.EntityLifecycle);
         }
 
         [Test]

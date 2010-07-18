@@ -5,7 +5,7 @@ using Meowth.OperationMachine.Domain.Events;
 
 namespace Meowth.OperationMachine.Domain.DomainInfrastructure
 {
-    public class EventRouter : IDomainEventBus
+    public class DomainEventBus : IDomainEventBus
     {
         private IDictionary<Type, ICollection<Action<IAnyDomainEvent>>> _commonRoutes
             = new Dictionary<Type, ICollection<Action<IAnyDomainEvent>>>();

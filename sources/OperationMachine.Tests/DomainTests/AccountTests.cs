@@ -17,13 +17,12 @@ namespace Meowth.OperationMachine.Tests
         [Test]
         public void WhenAccountCreatedEventGenerated()
         {
-            EntityLifecycleEvent<Account> @event = null;
+            EntityCreatedEvent<Account> @event = null;
             Container.Resolve<IDomainEventBus>()
-                .RegisterThreaded<EntityLifecycleEvent<Account>>(x => { @event = x; });
+                .RegisterThreaded<EntityCreatedEvent<Account>>(x => { @event = x; });
 
             var acc = new Account("expence");
             Assert.IsNotNull(@event);
-            Assert.AreEqual(EntityLifecyclePhase.Created, @event.EntityLifecycle);
             Assert.AreEqual(acc, @event.Subject);
         }
 
@@ -37,17 +36,16 @@ namespace Meowth.OperationMachine.Tests
         [Test]
         public void WhenSubaccountCreatedItIsCorrectAndEventIsGenerated()
         {
-            EntityLifecycleEvent<Account> @event = null;
+            EntityCreatedEvent<Account> @event = null;
             Container.Resolve<IDomainEventBus>()
-                .RegisterThreaded<EntityLifecycleEvent<Account>>(x => { @event = x; });
+                .RegisterThreaded<EntityCreatedEvent<Account>>(x => { @event = x; });
 
             var acc = new Account("root");
             Account acc2 = acc.CreateSubaccount("subroot");
             Assert.IsTrue(acc2.IsSubaccount);
 
             Assert.IsNotNull(@event);
-            Assert.IsInstanceOf(typeof (EntityLifecycleEvent<Account>), @event);
-            Assert.AreEqual(EntityLifecyclePhase.Created, @event.EntityLifecycle);
+            Assert.IsInstanceOf(typeof (EntityCreatedEvent<Account>), @event);
             Assert.AreEqual(acc2, @event.Subject);
         }
 

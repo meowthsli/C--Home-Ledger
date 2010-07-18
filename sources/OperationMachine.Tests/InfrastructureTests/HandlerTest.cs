@@ -1,4 +1,5 @@
-﻿using Meowth.OperationMachine.Domain.DomainInfrastructure;
+﻿using Meowth.OperationMachine.CommandHandlers;
+using Meowth.OperationMachine.Domain.DomainInfrastructure;
 using Microsoft.Practices.Unity;
 using NUnit.Framework;
 using Meowth.OperationMachine.SessionManagement;
@@ -13,10 +14,10 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
         public HandlerTest()
         {
             Container = new UnityContainer();
-            Container.RegisterType<IDomainEventBus, EventRouter>();
+            Container.RegisterType<IDomainEventBus, DomainEventBus>();
 
             Container
-                .RegisterInstance<IDomainEventBus>(new EventRouter())
+                .RegisterInstance<IDomainEventBus>(new DomainEventBus())
                 .RegisterType<IUnitOfWorkFactory, TestUoWFactory>()
                 .RegisterInstance<IAccountRepository>(new TestAccountRepository())
                 .RegisterType<MakeTransactionCommandHandler, MakeTransactionCommandHandler>();

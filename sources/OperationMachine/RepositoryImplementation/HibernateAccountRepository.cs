@@ -32,7 +32,7 @@ namespace Meowth.OperationMachine.RepositoryImplementation
             throw new NotImplementedException();
         }
 
-        public void OnAccountCreated(EntityLifecycleEvent<Account> accountCreatedEvent)
+        public void OnAccountCreated(EntityCreatedEvent<Account> accountCreatedEvent)
         {
             GetActiveSession().Save(accountCreatedEvent.Subject);
         }

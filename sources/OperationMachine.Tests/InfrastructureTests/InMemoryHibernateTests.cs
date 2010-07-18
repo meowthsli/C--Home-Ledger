@@ -46,7 +46,7 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
             new SchemaExport(cfg).Execute(true, true, false);
 
             _container
-                .RegisterInstance<IDomainEventBus>(new EventRouter())
+                .RegisterInstance<IDomainEventBus>(new DomainEventBus())
                 .RegisterInstance<ISessionFactory>(sessionFactory)
                 .RegisterType<IHibernateSessionManager, HibernateSessionManagerImpl>(
                     new ContainerControlledLifetimeManager())
@@ -57,7 +57,7 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
 
             var acr = (HibernateAccountRepository)_container.Resolve<IAccountRepository>();
             _container.Resolve<IDomainEventBus>()
-                .Register<EntityLifecycleEvent<Account>>(acr.OnAccountCreated);
+                .Register<EntityCreatedEvent<Account>>(acr.OnAccountCreated);
 
             DomainEntity.SetEventRouter(_container.Resolve<IDomainEventBus>());
         }
