@@ -20,7 +20,7 @@ namespace Meowth.OperationMachine
         }
     }
 
-    public class TransactionMapping : ClassMap<Transaction>
+    public class TransactionMapping : ClassMap<AccountingTransaction>
     {
         public TransactionMapping()
         {

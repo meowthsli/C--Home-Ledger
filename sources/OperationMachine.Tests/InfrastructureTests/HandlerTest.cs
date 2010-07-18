@@ -1,4 +1,5 @@
 ﻿using Meowth.OperationMachine.CommandHandlers;
+using Meowth.OperationMachine.Commands;
 using Meowth.OperationMachine.Domain.DomainInfrastructure;
 using Microsoft.Practices.Unity;
 using NUnit.Framework;
@@ -19,7 +20,8 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
             Container
                 .RegisterInstance<IDomainEventBus>(new DomainEventBus())
                 .RegisterType<IUnitOfWorkFactory, TestUoWFactory>()
-                .RegisterInstance<IAccountRepository>(new TestAccountRepository())
+                .RegisterType<IAccountRepository, TestAccountRepository>(
+                    new ContainerControlledLifetimeManager())
                 .RegisterType<MakeTransactionCommandHandler, MakeTransactionCommandHandler>();
 
             DomainEntity.SetEventRouter(Container.Resolve<IDomainEventBus>());
@@ -28,7 +30,7 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
         [Test]
         public void TestTransactionHandler()
         {
-            var cmd = new MakeTransactionCommand()
+            var cmd = new MakeAccountingTransactionCommandDTO()
                           {
                               Amount = 5.0m,
                               Name = "tx1",
@@ -36,7 +38,15 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
                               DestinationAccountName = "root.subroot2"
                           };
             var hndl = Container.Resolve<MakeTransactionCommandHandler>();
-            hndl.Execute(cmd);
+            
+            using (var uof = Container.Resolve<IUnitOfWorkFactory>().CreateUnitOfWork())
+            {
+                using (var tx = uof.CreateTransaction())
+                {
+                    hndl.Execute(cmd);
+                    tx.Commit();
+                }
+            }
 
             Assert.AreEqual(10.0, Container.Resolve<IAccountRepository>().GetRootAccount().GetTurnover());
         }
@@ -44,7 +54,7 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
         [TestFixtureTearDown]
         protected void OnTearDown()
         {
-            Container.Resolve<IDomainEventBus>().ClearAll();
+            Container.Resolve<IDomainEventBus>().ClearAllSubscribers();
         }
 
         protected IUnityContainer Container { get; private set; }

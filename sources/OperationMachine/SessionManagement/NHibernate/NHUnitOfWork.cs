@@ -41,7 +41,7 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
             _session.Close();
             _session.Dispose();
 
-            _eventRouter.ClearThreaded();
+            _eventRouter.ClearThreadedSubscribers();
         }
 
         /// <summary> Creates new wrapper for hibernate transaction </summary>

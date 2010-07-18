@@ -8,10 +8,9 @@ namespace Meowth.OperationMachine.Domain.Entities.Transactions
     /// <summary>
     /// Accounting transaction class
     /// </summary>
-    public class Transaction
-        : DomainEntity
+    public class AccountingTransaction : DomainEntity
     {
-        public Transaction(string name, Account source, Account destination, decimal amount)
+        public AccountingTransaction(string name, Account source, Account destination, decimal amount)
         {
             if (source == destination)
                 throw new InvalidOperationException("acc1 == acc2");
@@ -22,7 +21,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Transactions
             Amount = amount;
             // TODO: date
 
-            Publish(new EntityCreatedEvent<Transaction>(this));
+            Publish(new EntityCreatedEvent<AccountingTransaction>(this));
         }
 
         public virtual Guid Id { get; protected set; }
@@ -51,10 +50,10 @@ namespace Meowth.OperationMachine.Domain.Entities.Transactions
             Destination.TransactCredit(Amount);
 
             IsExecuted = true;
-            Publish(new TransactionExecutedEvent(this));
+            Publish(new AccountingTransactionExecutedEvent(this));
         }
 
-        protected Transaction()
+        protected AccountingTransaction()
         {
             
         }

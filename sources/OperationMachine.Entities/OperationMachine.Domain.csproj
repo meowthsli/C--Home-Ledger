@@ -49,17 +49,18 @@
     <Compile Include="DomainInfrastructure\IDomainEventBus.cs" />
     <Compile Include="DomainInfrastructure\DomainEventBus.cs" />
     <Compile Include="DomainInfrastructure\Repository\IAccountRepository.cs" />
+    <Compile Include="DomainInfrastructure\Repository\ITransactionRepository.cs" />
     <Compile Include="Entities\Accounts\Account.cs" />
     <Compile Include="Entities\Accounts\AccountPathName.cs" />
     <Compile Include="Entities\DomainEntity[T].cs" />
     <Compile Include="Entities\IAnyDomainEntity.cs" />
-    <Compile Include="Entities\Transactions\Transaction.cs" />
+    <Compile Include="Entities\Transactions\AccountingTransaction.cs" />
     <Compile Include="Events\Accounts\TurnoverEvent.cs" />
     <Compile Include="Events\Accounts\TurnoverType.cs" />
     <Compile Include="Events\DomainEvent[T].cs" />
     <Compile Include="Events\EntityCreatedEvent.cs" />
     <Compile Include="Events\IAnyDomainEvent.cs" />
-    <Compile Include="Events\Transactions\TransactionExecutedEvent.cs" />
+    <Compile Include="Events\AccountingTransactions\AccountingTransactionExecutedEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

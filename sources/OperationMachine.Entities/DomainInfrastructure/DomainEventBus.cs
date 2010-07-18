@@ -63,14 +63,14 @@ namespace Meowth.OperationMachine.Domain.DomainInfrastructure
                     route(message);
         }
 
-        public void ClearThreaded()
+        public void ClearThreadedSubscribers()
         {
             GetRoutes().Clear();
         }
 
-        public void ClearAll()
+        public void ClearAllSubscribers()
         {
-            ClearThreaded();
+            ClearThreadedSubscribers();
             _commonRoutes.Clear();
         }
     }

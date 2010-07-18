@@ -1,4 +1,5 @@
 ﻿using System;
+using Meowth.OperationMachine.Commands;
 using Meowth.OperationMachine.Domain.Accounts;
 using Meowth.OperationMachine.Domain.DomainInfrastructure;
 using Meowth.OperationMachine.Domain.DomainInfrastructure.Repository;
@@ -37,32 +38,22 @@ namespace Meowth.OperationMachine.CommandHandlers
         /// Executes handler
         /// </summary>
         /// <param name="cmd"></param>
-        public void Execute(MakeTransactionCommand cmd)
+        public void Execute(MakeAccountingTransactionCommandDTO cmd)
         {
             Account rootAccount = null;
             Func<Account> getRootAccount = () => rootAccount
                 ?? (rootAccount = _accountRepository.GetRootAccount());
 
-            using (var uof = _uowFactory.CreateUnitOfWork())
-            {
-                using (var tx = uof.CreateTransaction())
-                {
-                    _eventBus.ClearThreaded();
+            var sourcePathName = AccountPathName.FromString(cmd.SourceAccountName);
+            var sourceAccount = _accountRepository.FindByPathName(sourcePathName) ??
+                                getRootAccount().CreateSubaccountsTree(sourcePathName);
 
-                    var sourcePathName = AccountPathName.FromString(cmd.SourceAccountName);
-                    var sourceAccount = _accountRepository.FindByPathName(sourcePathName) ??
-                                        getRootAccount().CreateSubaccountsTree(sourcePathName);
+            var destinationPathName = AccountPathName.FromString(cmd.DestinationAccountName);
+            var destinationAccount = _accountRepository.FindByPathName(destinationPathName) ??
+                                     getRootAccount().CreateSubaccountsTree(destinationPathName);
 
-                    var destinationPathName = AccountPathName.FromString(cmd.DestinationAccountName);
-                    var destinationAccount = _accountRepository.FindByPathName(destinationPathName) ??
-                                             getRootAccount().CreateSubaccountsTree(destinationPathName);
-
-                    var tran = new Transaction(cmd.Name, sourceAccount, destinationAccount, cmd.Amount);
-                    tran.Execute();
-
-                    tx.Commit();
-                }
-            }
+            var tran = new AccountingTransaction(cmd.Name, sourceAccount, destinationAccount, cmd.Amount);
+            tran.Execute();
         }
     }
 }

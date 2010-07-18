@@ -14,11 +14,11 @@ namespace Meowth.OperationMachine.Tests
         [Test]
         public void WhenTransactionCreatedThenEventGenerated()
         {
-            EntityCreatedEvent<Transaction> @event = null;
+            EntityCreatedEvent<AccountingTransaction> @event = null;
             Container.Resolve<IDomainEventBus>()
-                .RegisterThreaded<EntityCreatedEvent<Transaction>>(e => { @event = e; });
+                .RegisterThreaded<EntityCreatedEvent<AccountingTransaction>>(e => { @event = e; });
             
-            var tx = new Transaction("tx1", 
+            var tx = new AccountingTransaction("tx1", 
                 new Account("acc1"), 
                 new Account("acc2"), 0.0m);
             Assert.IsNotNull(@event);
@@ -34,7 +34,7 @@ namespace Meowth.OperationMachine.Tests
 
             const decimal amount = 77.0m;
 
-            var tx = new Transaction("tx1",
+            var tx = new AccountingTransaction("tx1",
                 accIncome,
                 accOutcome, 
                 amount);
@@ -62,12 +62,12 @@ namespace Meowth.OperationMachine.Tests
             const decimal amount1 = 42.0m;
             const decimal amount2 = 77.0m;
 
-            new Transaction("tx1",
+            new AccountingTransaction("tx1",
                 accIncome,
                 accOutcome,
                 amount1).Execute();
 
-            new Transaction("tx2",
+            new AccountingTransaction("tx2",
                 accOutcome,
                 accIncome,
                 amount2).Execute();
@@ -88,7 +88,7 @@ namespace Meowth.OperationMachine.Tests
         [Test]
         public void WhenTransactionExecutedMoreThenOnceThenExceptionGenerated()
         {
-            var tx = new Transaction("tx1",
+            var tx = new AccountingTransaction("tx1",
                 new Account("acc1"),
                 new Account("acc2"), 0.0m);
             tx.Execute();
@@ -99,7 +99,7 @@ namespace Meowth.OperationMachine.Tests
         public void WhenAccountsAreEqualThenExceptionIsGenerated()
         {
             var acc = new Account("root");
-            Assert.Throws<InvalidOperationException>(() => new Transaction("tx", acc, acc, 0.0m));
+            Assert.Throws<InvalidOperationException>(() => new AccountingTransaction("tx", acc, acc, 0.0m));
         }
     }
 }
