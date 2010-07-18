@@ -9,7 +9,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Transactions
     /// Transaction class
     /// </summary>
     public class Transaction
-        : DomainEntity<Transaction>
+        : DomainEntity
     {
         public Transaction(string name, Account source, Account destination, decimal amount)
         {

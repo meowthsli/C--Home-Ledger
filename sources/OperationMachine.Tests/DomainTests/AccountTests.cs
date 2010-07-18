@@ -1,10 +1,11 @@
 ﻿using Meowth.OperationMachine.Domain.Accounts;
-
-using Meowth.OperationMachine.Domain.Entities;
+using Meowth.OperationMachine.Domain.DomainInfrastructure;
 using Meowth.OperationMachine.Domain.Entities.Accounts;
 
 using Meowth.OperationMachine.Domain.Events;
 using Meowth.OperationMachine.Domain.Events.Accounts;
+
+using Microsoft.Practices.Unity;
 
 using NUnit.Framework;
 
@@ -17,7 +18,8 @@ namespace Meowth.OperationMachine.Tests
         public void WhenAccountCreatedEventGenerated()
         {
             EntityLifecycleEvent<Account> @event = null;
-            DomainEntity.Subscribe<EntityLifecycleEvent<Account>>(x => { @event = x; });
+            Container.Resolve<IDomainEventBus>()
+                .RegisterThreaded<EntityLifecycleEvent<Account>>(x => { @event = x; });
 
             var acc = new Account("expence");
             Assert.IsNotNull(@event);
@@ -36,7 +38,8 @@ namespace Meowth.OperationMachine.Tests
         public void WhenSubaccountCreatedItIsCorrectAndEventIsGenerated()
         {
             EntityLifecycleEvent<Account> @event = null;
-            DomainEntity.Subscribe<EntityLifecycleEvent<Account>>(x => { @event = x; });
+            Container.Resolve<IDomainEventBus>()
+                .RegisterThreaded<EntityLifecycleEvent<Account>>(x => { @event = x; });
 
             var acc = new Account("root");
             Account acc2 = acc.CreateSubaccount("subroot");
@@ -63,7 +66,8 @@ namespace Meowth.OperationMachine.Tests
         public void WhenTransactionDebtOrCreditThenEventGenerated()
         {
             TurnoverEvent @event = null;
-            DomainEntity.Subscribe<TurnoverEvent>(x => { @event = x; });
+            Container.Resolve<IDomainEventBus>()
+                .RegisterThreaded<TurnoverEvent>(x => { @event = x; });
 
             var acc = new Account("root");
             acc.TransactDebt(0.0m);
@@ -88,8 +92,8 @@ namespace Meowth.OperationMachine.Tests
             Assert.AreEqual(10.0m, acc.CreditTurnover);
             Assert.AreEqual(5.0m, acc.DebtTurnover);
 
-            Assert.AreEqual(15.0m, acc.Turnover);
-            Assert.AreEqual(5.0, acc.Balance);
+            Assert.AreEqual(15.0m, acc.GetTurnover());
+            Assert.AreEqual(5.0, acc.GetBalance());
         }
 
         [Test]
@@ -105,8 +109,8 @@ namespace Meowth.OperationMachine.Tests
             Assert.AreEqual(17.0m, acc.CreditTurnover);
             Assert.AreEqual(6.0m, acc.DebtTurnover);
 
-            Assert.AreEqual(23.0m, acc.Turnover);
-            Assert.AreEqual(11.0, acc.Balance);
+            Assert.AreEqual(23.0m, acc.GetTurnover());
+            Assert.AreEqual(11.0, acc.GetBalance());
         }
     }
 }

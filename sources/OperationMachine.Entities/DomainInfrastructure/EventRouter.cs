@@ -1,49 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using Meowth.OperationMachine.Domain.Events;
 
 namespace Meowth.OperationMachine.Domain.DomainInfrastructure
 {
-    public class EventRouter : IRouteEvents
+    public class EventRouter : IDomainEventBus
     {
-        private readonly IDictionary<Type, ICollection<Action<IAnyDomainEvent>>> _routes
+        private IDictionary<Type, ICollection<Action<IAnyDomainEvent>>> _commonRoutes
             = new Dictionary<Type, ICollection<Action<IAnyDomainEvent>>>();
-
-        private static readonly object Locker = new object();
+        
+        [ThreadStatic]
+        private static IDictionary<Type, ICollection<Action<IAnyDomainEvent>>> _routes;
 
         public void Register<TEvent>(Action<TEvent> route)
             where TEvent : class, IAnyDomainEvent
         {
-            lock (Locker)
-            {
-                var routingKey = typeof(TEvent);
-                ICollection<Action<IAnyDomainEvent>> routes;
+            var routingKey = typeof(TEvent);
+            ICollection<Action<IAnyDomainEvent>> routes;
 
-                if (!_routes.TryGetValue(routingKey, out routes))
-                    _routes[routingKey] = routes = new LinkedList<Action<IAnyDomainEvent>>();
+        
+            if (!_commonRoutes.TryGetValue(routingKey, out routes))
+                _commonRoutes[routingKey] = routes = new LinkedList<Action<IAnyDomainEvent>>();
 
-                routes.Add(message => route(message as TEvent));
-            }
+            routes.Add((message) => route(message as TEvent));
+        }
+
+        public void RegisterThreaded<TEvent>(Action<TEvent> route) where TEvent : class, IAnyDomainEvent
+        {
+            var routingKey = typeof(TEvent);
+            ICollection<Action<IAnyDomainEvent>> routes;
+
+            if (!GetRoutes().TryGetValue(routingKey, out routes))
+                GetRoutes()[routingKey] = routes = new LinkedList<Action<IAnyDomainEvent>>();
+
+            routes.Add((message) => route(message as TEvent));
+        }
+
+        private static IDictionary<Type, ICollection<Action<IAnyDomainEvent>>> GetRoutes()
+        {
+            return _routes ?? (_routes = new Dictionary<Type, ICollection<Action<IAnyDomainEvent>>>());
         }
 
         public void Route(IAnyDomainEvent message)
         {
             ICollection<Action<IAnyDomainEvent>> routes;
 
-            if (!_routes.TryGetValue(message.GetType(), out routes))
+            if (!_commonRoutes.TryGetValue(message.GetType(), out routes))
             {
                 Trace.WriteLine("There is no route registered for message of type " + message.GetType());
-                return;
             }
-
-            lock (Locker)
-            {
+            else
                 foreach (var route in routes)
                     route(message);
+
+            if (!GetRoutes().TryGetValue(message.GetType(), out routes))
+            {
+                Trace.WriteLine("There is no threaded route registered for message of type " + message.GetType());
             }
+            else
+                foreach (var route in routes)
+                    route(message);
+        }
+
+        public void ClearThreaded()
+        {
+            _routes.Clear();
+        }
+
+        public void ClearAll()
+        {
+            ClearThreaded();
+            _commonRoutes.Clear();
         }
     }
 }

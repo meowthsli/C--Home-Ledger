@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libs\Unity\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -42,8 +46,9 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DomainInfrastructure\IRouteEvents.cs" />
+    <Compile Include="DomainInfrastructure\IDomainEventBus.cs" />
     <Compile Include="DomainInfrastructure\EventRouter.cs" />
+    <Compile Include="DomainInfrastructure\Repository\IAccountRepository.cs" />
     <Compile Include="Entities\Accounts\Account.cs" />
     <Compile Include="Entities\Accounts\AccountPathName.cs" />
     <Compile Include="Entities\DomainEntity[T].cs" />

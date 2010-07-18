@@ -1,12 +1,11 @@
-﻿using System;
-using FluentNHibernate.Automapping;
+﻿using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
-using Meowth.OperationMachine.Domain.Accounts;
-using Meowth.OperationMachine.Domain;
 using Meowth.OperationMachine.Domain.Entities.Accounts;
-using NHibernate;
-using System.Collections.Generic;
+using Microsoft.Practices.Unity;
+using Meowth.OperationMachine.Domain.DomainInfrastructure;
+using Meowth.OperationMachine.Domain.Entities;
+using Meowth.OperationMachine.Domain.DomainInfrastructure.Repository;
 
 namespace Meowth.OperationMachine
 {
@@ -16,54 +15,45 @@ namespace Meowth.OperationMachine
         /// <summary> In-memory database construction </summary>
         public OperationMachine()
         {
-            _sessionFactory = Fluently.Configure()
-               .Mappings(m => m.AutoMappings.Add(AutoMap
-                   .AssemblyOf<Account>()
-                   .Override<Account>(a => a.IgnoreProperty(x => x.Turnover))
-                   .Override<Account>(a => a.IgnoreProperty(x => x.Balance))))
-               .Database(SQLiteConfiguration.Standard
-                   .ConnectionString("Data Source=:memory:;Version=3;BinaryGUID=False;New=True;")
-                   .Driver("NHibernate.Driver.SQLite20Driver")
-                   .Dialect("NHibernate.Dialect.SQLiteDialect")
-                   .QuerySubstitutions("true=1;false=0")
-                   .ProxyFactoryFactory("NHibernate.ByteCode.LinFu.ProxyFactoryFactory, NHibernate.ByteCode.LinFu"))
-               .BuildConfiguration()
-               .BuildSessionFactory();
+            DomainEntity.SetEventRouter(_container.Resolve<IDomainEventBus>());
 
-            using(var session = _sessionFactory.OpenSession())
-            using(var tx = session.BeginTransaction())
-            {
-                Initialize(session);
-                tx.Commit();
-            }
+            //    .RegisterType<IUnitOfWork, NHUnitOfWork>()
+            //    .RegisterType<IAccountRepository, HibernateAccountRepository>()
+            //    .RegisterType<INHibernateSessionManager, NHibernateSessionManagerImpl>()
+            //    .RegisterInstance(sessionFactory);
         }
 
-        private void Initialize(ISession session)
-        {
-            var acc = new Account("root");
-            session.Save(acc);
-        }
+        private readonly UnityContainer _container = new UnityContainer();
 
-        public interface IDateTimeService
-        {
-            DateTime Now { get; }
-        }
-        
-        public Account GetAccount(AccountPathName pathName)
-        {
-            return null;
-        }
 
-        public void Reset()
-        {
-            // TODO:
-        }
+        //public void MakeTransaction(MakeTransactionCommand cmd)
+        //{
+        //    Account rootAccount = null;
+        //    var accountRepository = ...
 
-        public IEnumerable<Account> GetAccounts()
-        {
-            yield break;
-        }
+        //    Func<Account> getRootAccount = () => rootAccount ?? (rootAccount = accountRepository.GetRootAccount());
+            
+        //    using(uofFactory.CreateUnitOfWork())
+        //    {
+        //        var sourcePathName = AccountPathName.FromString(cmd.SourceAccountName);
+        //        var sourceAccount = accountRepository.FindByPathName(sourcePathName) ??
+        //                            getRootAccount().CreateSubaccountsTree(sourcePathName);
 
-        private readonly ISessionFactory _sessionFactory;
+        //        var destinationPathName = AccountPathName.FromString(cmd.DestinationAccountName);
+        //        var destinationAccount = accountRepository.FindByPathName(destinationPathName) ??
+        //                                 getRootAccount().CreateSubaccountsTree(destinationPathName);
+
+        //        var tran = new Transaction(cmd.Name, sourceAccount, destinationAccount, cmd.Amount);
+        //        tran.Execute();
+        //    }
+        //}
+    }
+
+    public class MakeTransactionCommand
+    {
+        public string Name { get; set; }
+        public string SourceAccountName { get; set; }
+        public string DestinationAccountName { get; set; }
+        public decimal Amount { get; set; }
     }
 }

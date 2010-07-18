@@ -8,7 +8,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
     /// <summary> 
     /// Active-passive account 
     /// </summary>
-    public class Account : DomainEntity<Account>
+    public class Account : DomainEntity
     {
         public Account(string accountName)
         {
@@ -42,7 +42,10 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
         public virtual AccountPathName PathName { get; protected set; }
 
         /// <summary> Account balance </summary>
-        public virtual decimal Balance { get { return (CreditTurnover - DebtTurnover); } }
+        public virtual decimal GetBalance()
+        {
+            return (CreditTurnover - DebtTurnover);
+        }
 
         /// <summary> </summary>
         public virtual decimal CreditTurnover { get; protected set; }
@@ -53,8 +56,11 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
         /// <summary> </summary>
         public virtual DateTime Created { get; protected set; }
 
-        public virtual decimal Turnover { get { return CreditTurnover + DebtTurnover; } }
-        
+        public virtual decimal GetTurnover()
+        {
+            return CreditTurnover + DebtTurnover;
+        }
+
         public virtual bool IsSubaccount { get { return Parent != null; } }
 
         #endregion
@@ -67,9 +73,12 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
         /// <returns></returns>
         public virtual Account CreateSubaccount(string name)
         {
-            var acc = new Account(name, this);
-            Publish(new EntityLifecycleEvent<Account>(acc, EntityLifecyclePhase.Created));
-            return acc;
+            return new Account(name, this);
+        }
+
+        public virtual Account CreateSubaccountsTree(AccountPathName name)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

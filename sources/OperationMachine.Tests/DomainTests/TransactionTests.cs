@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using Meowth.OperationMachine.Domain.Entities.Accounts;
 using NUnit.Framework;
 using Meowth.OperationMachine.Domain.Events;
 using Meowth.OperationMachine.Domain.Entities.Transactions;
-using Meowth.OperationMachine.Domain.Entities;
+using Meowth.OperationMachine.Domain.DomainInfrastructure;
+using Microsoft.Practices.Unity;
 
 namespace Meowth.OperationMachine.Tests
 {
@@ -14,7 +15,8 @@ namespace Meowth.OperationMachine.Tests
         public void WhenTransactionCreatedThenEventGenerated()
         {
             EntityLifecycleEvent<Transaction> @event = null;
-            DomainEntity.Subscribe<EntityLifecycleEvent<Transaction>>(e => { @event = e; });
+            Container.Resolve<IDomainEventBus>()
+                .RegisterThreaded<EntityLifecycleEvent<Transaction>>(e => { @event = e; });
             
             var tx = new Transaction("tx1", 
                 new Account("acc1"), 
@@ -41,14 +43,14 @@ namespace Meowth.OperationMachine.Tests
 
             Assert.AreEqual(0.0m, accIncome.CreditTurnover);
             Assert.AreEqual(amount, accIncome.DebtTurnover);
-            Assert.AreEqual(-amount, accIncome.Balance);
+            Assert.AreEqual(-amount, accIncome.GetBalance());
 
             Assert.AreEqual(0.0m, accOutcome.DebtTurnover);
             Assert.AreEqual(amount, accOutcome.CreditTurnover);
-            Assert.AreEqual(amount, accOutcome.Balance);
+            Assert.AreEqual(amount, accOutcome.GetBalance());
 
-            Assert.AreEqual(0.0m, rootAccount.Balance);
-            Assert.AreEqual(2 * amount, rootAccount.Turnover);
+            Assert.AreEqual(0.0m, rootAccount.GetBalance());
+            Assert.AreEqual(2 * amount, rootAccount.GetTurnover());
         }
         [Test]
         public void WhenTransactionExecutedOnhierarchicalAccountsThenParametersCalculated()
@@ -74,14 +76,14 @@ namespace Meowth.OperationMachine.Tests
 
             Assert.AreEqual(amount2, accIncome.CreditTurnover);
             Assert.AreEqual(amount1, accIncome.DebtTurnover);
-            Assert.AreEqual(amount2-amount1, accIncome.Balance);
+            Assert.AreEqual(amount2-amount1, accIncome.GetBalance());
 
             Assert.AreEqual(amount2, accOutcome.DebtTurnover);
             Assert.AreEqual(amount1, accOutcome.CreditTurnover);
-            Assert.AreEqual(amount1-amount2, accOutcome.Balance);
+            Assert.AreEqual(amount1-amount2, accOutcome.GetBalance());
 
-            Assert.AreEqual(0.0m, rootAccount.Balance);
-            Assert.AreEqual(2* (amount1+amount2), rootAccount.Turnover);
+            Assert.AreEqual(0.0m, rootAccount.GetBalance());
+            Assert.AreEqual(2* (amount1+amount2), rootAccount.GetTurnover());
         }
 
         [Test]

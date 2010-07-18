@@ -1,6 +1,7 @@
 ﻿using System;
 using Meowth.OperationMachine.Domain.Events;
 using Meowth.OperationMachine.Domain.DomainInfrastructure;
+using Microsoft.Practices.ServiceLocation;
 
 namespace Meowth.OperationMachine.Domain.Entities
 {
@@ -9,25 +10,17 @@ namespace Meowth.OperationMachine.Domain.Entities
     /// </summary>
     public abstract class DomainEntity : IAnyDomainEntity
     {
-        public static void Subscribe<TEvent>(Action<TEvent> handler)
-            where TEvent : class, IAnyDomainEvent
+        public static void SetEventRouter(IDomainEventBus bus)
         {
-            Bus.Register(handler);
+            Bus = bus;
         }
 
-        protected static readonly EventRouter Bus = new EventRouter();
-    }
-
-    /// <summary> 
-    /// Domain entity that routes events of specified type
-    /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    public abstract class DomainEntity<TEntity> : DomainEntity
-        where TEntity : class, IAnyDomainEntity
-    {
-        protected static void Publish(DomainEvent<TEntity> domainEvent)
+        protected void Publish<TEntity>(DomainEvent<TEntity> domainEvent)
+            where TEntity : class, IAnyDomainEntity
         {
             Bus.Route(domainEvent);
         }
+
+        protected static IDomainEventBus Bus;
     }
 }
