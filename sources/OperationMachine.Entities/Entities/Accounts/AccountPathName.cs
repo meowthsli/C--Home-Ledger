@@ -9,6 +9,12 @@ namespace Meowth.OperationMachine.Domain.Accounts
     public class AccountPathName
     {
         public static readonly string SEPARATOR = ".";
+        public static readonly string ROOT = "root";
+
+        public AccountPathName()
+        {
+            _asString = ROOT;
+        }
 
         public virtual string Path
         {

@@ -65,7 +65,7 @@ namespace Meowth.OperationMachine.Domain.DomainInfrastructure
 
         public void ClearThreaded()
         {
-            _routes.Clear();
+            GetRoutes().Clear();
         }
 
         public void ClearAll()

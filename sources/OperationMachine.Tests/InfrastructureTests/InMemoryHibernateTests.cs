@@ -1,4 +1,5 @@
-﻿using FluentNHibernate.Automapping;
+﻿using System.Diagnostics;
+using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using Meowth.OperationMachine.Domain.DomainInfrastructure;
@@ -13,6 +14,7 @@ using Meowth.OperationMachine.Domain.DomainInfrastructure.Repository;
 using Meowth.OperationMachine.RepositoryImplementation;
 using NHibernate.Tool.hbm2ddl;
 using Meowth.OperationMachine.Domain.Entities;
+using System;
 namespace Meowth.OperationMachine.Tests.InfrastructureTests
 {
     [TestFixture]
@@ -23,9 +25,9 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
         public InMemoryHibernateTests()
         {
             var cfg = Fluently.Configure()
-               .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Account>())
+               .Mappings(m => m.FluentMappings.AddFromAssemblyOf<AccountMapping>())
                .Database(SQLiteConfiguration.Standard
-                   .ConnectionString("Data Source=:memory:;Version=3;BinaryGUID=False;New=True;")
+                   .ConnectionString("Data Source=:memory:;Version=3;BinaryGUID=True;New=True;Pooling=True;Max Pool Size=1;")
                    .Driver("NHibernate.Driver.SQLite20Driver")
                    .Dialect("NHibernate.Dialect.SQLiteDialect")
                    .QuerySubstitutions("true=1;false=0")
@@ -35,7 +37,13 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
             var sessionFactory = cfg
                .BuildSessionFactory();
 
-            new SchemaExport(cfg).Create(true, true);
+            foreach (var md in sessionFactory.GetAllClassMetadata())
+                Trace.WriteLine(md.Key);
+
+            foreach (var md in sessionFactory.GetAllCollectionMetadata())
+                Trace.WriteLine(md.Key);
+
+            new SchemaExport(cfg).Execute(true, true, false);
 
             _container
                 .RegisterInstance<IDomainEventBus>(new EventRouter())
@@ -57,7 +65,19 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
         [Test]
         public void Test()
         {
-            
+            OnUow(() =>
+                      {
+                          var acc = new Account("root");
+                      }
+                );
+        }
+
+        private void OnUow(Action action)
+        {
+            using (_container.Resolve<IUnitOfWorkFactory>().CreateUnitOfWork())
+            {
+                action();
+            }
         }
     }
 }

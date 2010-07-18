@@ -53,6 +53,11 @@ namespace Meowth.OperationMachine.Domain.Entities.Transactions
             IsExecuted = true;
             Publish(new TransactionExecutedEvent(this));
         }
+
+        protected Transaction()
+        {
+            
+        }
     }
 
 }
