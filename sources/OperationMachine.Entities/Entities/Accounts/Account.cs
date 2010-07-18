@@ -12,6 +12,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
     {
         public Account(string accountName)
         {
+            Id = Guid.NewGuid();
             Name = accountName;
             PathName = AccountPathName.FromString(accountName);
 

@@ -15,6 +15,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Transactions
             if (source == destination)
                 throw new InvalidOperationException("acc1 == acc2");
 
+            Id = Guid.NewGuid();
             Name = name;
             Source = source;
             Destination = destination;

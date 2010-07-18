@@ -49,7 +49,7 @@
     <Compile Include="DomainInfrastructure\IDomainEventBus.cs" />
     <Compile Include="DomainInfrastructure\DomainEventBus.cs" />
     <Compile Include="DomainInfrastructure\Repository\IAccountRepository.cs" />
-    <Compile Include="DomainInfrastructure\Repository\ITransactionRepository.cs" />
+    <Compile Include="DomainInfrastructure\Repository\IAccountingTransactionRepository.cs" />
     <Compile Include="Entities\Accounts\Account.cs" />
     <Compile Include="Entities\Accounts\AccountPathName.cs" />
     <Compile Include="Entities\DomainEntity[T].cs" />

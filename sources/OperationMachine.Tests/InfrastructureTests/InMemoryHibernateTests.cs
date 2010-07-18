@@ -15,6 +15,7 @@ using Meowth.OperationMachine.RepositoryImplementation;
 using NHibernate.Tool.hbm2ddl;
 using Meowth.OperationMachine.Domain.Entities;
 using System;
+using Meowth.OperationMachine.Domain.Entities.Transactions;
 namespace Meowth.OperationMachine.Tests.InfrastructureTests
 {
     [TestFixture]
@@ -47,10 +48,12 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
 
             _container
                 .RegisterInstance<IDomainEventBus>(new DomainEventBus())
-                .RegisterInstance<ISessionFactory>(sessionFactory)
+                .RegisterInstance(sessionFactory)
                 .RegisterType<IHibernateSessionManager, HibernateSessionManagerImpl>(
                     new ContainerControlledLifetimeManager())
                 .RegisterType<IAccountRepository, HibernateAccountRepository>(
+                    new ContainerControlledLifetimeManager())
+                .RegisterType<IAccountingTransactionRepository, HibernateAccountingTransactionRepository>(
                     new ContainerControlledLifetimeManager())
                 .RegisterType<IUnitOfWorkFactory, HibernateUnitOfWorkFactory>(
                     new ContainerControlledLifetimeManager());
@@ -59,24 +62,36 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
             _container.Resolve<IDomainEventBus>()
                 .Register<EntityCreatedEvent<Account>>(acr.OnAccountCreated);
 
+            var tr = (HibernateAccountingTransactionRepository)_container.Resolve<IAccountingTransactionRepository>();
+            _container.Resolve<IDomainEventBus>()
+                .Register<EntityCreatedEvent<AccountingTransaction>>(tr.OnTransactionCreated);
+
             DomainEntity.SetEventRouter(_container.Resolve<IDomainEventBus>());
         }
 
         [Test]
-        public void Test()
+        public void WhenAccountsCreatedAreCreatedInDatabaseAndTransactionExecutedThenOk()
         {
             OnUow(() =>
                       {
-                          var acc = new Account("root");
+                          var acc1 = new Account("root");
+                          var acc2 = new Account("some another");
+
+                          var tx = new AccountingTransaction("tx1", acc1, acc2, 42.0m);
+                          tx.Execute();
                       }
                 );
         }
 
         private void OnUow(Action action)
         {
-            using (_container.Resolve<IUnitOfWorkFactory>().CreateUnitOfWork())
+            using (var uow =_container.Resolve<IUnitOfWorkFactory>().CreateUnitOfWork())
             {
-                action();
+                using (var tx = uow.CreateTransaction())
+                {
+                    action();
+                    tx.Commit();
+                }
             }
         }
     }
