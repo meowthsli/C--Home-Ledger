@@ -16,11 +16,17 @@ using NHibernate.Tool.hbm2ddl;
 using Meowth.OperationMachine.Domain.Entities;
 using System;
 using Meowth.OperationMachine.Domain.Entities.Transactions;
+using System.IO;
 namespace Meowth.OperationMachine.Tests.InfrastructureTests
 {
     [TestFixture]
     class InMemoryHibernateTests
     {
+        static InMemoryHibernateTests()
+        {
+            log4net.Config.XmlConfigurator.Configure();
+        }
+
         private readonly UnityContainer _container = new UnityContainer();
         
         public InMemoryHibernateTests()
@@ -28,7 +34,8 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
             var cfg = Fluently.Configure()
                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<AccountMapping>())
                .Database(SQLiteConfiguration.Standard
-                   .ConnectionString("Data Source=:memory:;Version=3;BinaryGUID=True;New=True;Pooling=True;Max Pool Size=1;")
+                   .ShowSql()
+                   .ConnectionString( string.Format("Data Source={0};Version=3;BinaryGUID=True;New=True;Pooling=True;Max Pool Size=1;", Path.GetTempFileName()))
                    .Driver("NHibernate.Driver.SQLite20Driver")
                    .Dialect("NHibernate.Dialect.SQLiteDialect")
                    .QuerySubstitutions("true=1;false=0")
@@ -78,7 +85,7 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
                           var acc2 = new Account("some another");
 
                           var tx = new AccountingTransaction("tx1", acc1, acc2, 42.0m);
-                          tx.Execute();
+                          //tx.Execute();
                       }
                 );
         }
