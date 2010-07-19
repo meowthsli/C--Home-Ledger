@@ -1,19 +1,15 @@
 ﻿using System.Diagnostics;
-using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using Meowth.OperationMachine.Domain.DomainInfrastructure;
 using Meowth.OperationMachine.Domain.Entities.Accounts;
-using Meowth.OperationMachine.Domain.Events;
 using NUnit.Framework;
 using Microsoft.Practices.Unity;
 using Meowth.OperationMachine.SessionManagement.NHibernate;
 using Meowth.OperationMachine.SessionManagement;
-using NHibernate;
 using Meowth.OperationMachine.Domain.DomainInfrastructure.Repository;
 using Meowth.OperationMachine.RepositoryImplementation;
 using NHibernate.Tool.hbm2ddl;
-using Meowth.OperationMachine.Domain.Entities;
 using System;
 using Meowth.OperationMachine.Domain.Entities.Transactions;
 using System.IO;
@@ -54,8 +50,8 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
             new SchemaExport(cfg).Execute(true, true, false);
 
             _container
-                .RegisterInstance<IDomainEventBus>(new DomainEventBus())
                 .RegisterInstance(sessionFactory)
+                .RegisterType<IDomainEventBus, DomainEventBusGate>()
                 .RegisterType<IHibernateSessionManager, HibernateSessionManagerImpl>(
                     new ContainerControlledLifetimeManager())
                 .RegisterType<IAccountRepository, HibernateAccountRepository>(
@@ -65,15 +61,13 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
                 .RegisterType<IUnitOfWorkFactory, HibernateUnitOfWorkFactory>(
                     new ContainerControlledLifetimeManager());
 
-            var acr = (HibernateAccountRepository)_container.Resolve<IAccountRepository>();
-            _container.Resolve<IDomainEventBus>()
-                .Register<EntityCreatedEvent<Account>>(acr.OnAccountCreated);
+            _container.AddExtension(new RegistrationExtension());
+        }
 
-            var tr = (HibernateAccountingTransactionRepository)_container.Resolve<IAccountingTransactionRepository>();
-            _container.Resolve<IDomainEventBus>()
-                .Register<EntityCreatedEvent<AccountingTransaction>>(tr.OnTransactionCreated);
-
-            DomainEntity.SetEventRouter(_container.Resolve<IDomainEventBus>());
+        [TestFixtureTearDown]
+        public void After()
+        {
+            _container.Resolve<IDomainEventBus>().ClearAllSubscribers();
         }
 
         [Test]
@@ -85,7 +79,7 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
                           var acc2 = new Account("some another");
 
                           var tx = new AccountingTransaction("tx1", acc1, acc2, 42.0m);
-                          //tx.Execute();
+                          tx.Execute();
                       }
                 );
         }

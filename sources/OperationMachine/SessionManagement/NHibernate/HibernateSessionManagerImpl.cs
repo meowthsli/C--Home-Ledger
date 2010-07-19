@@ -5,6 +5,13 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
 {
     public class HibernateSessionManagerImpl : IHibernateSessionManager
     {
+        private readonly ISessionFactory _sessionFactory;
+
+        public HibernateSessionManagerImpl(ISessionFactory sessionFactory)
+        {
+            _sessionFactory = sessionFactory;
+        }
+
         [ThreadStatic]
         private static ISession _current;
 
@@ -15,15 +22,16 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
             return _current;
         }
 
-        public void SetActiveSession(ISession session)
+        public ISession OpenSession()
         {
             if (_current != null)
                 throw new InvalidOperationException("There is already an active ISession instance for this thread");
 
-            _current = session;
+            _current = _sessionFactory.OpenSession();
+            return _current;
         }
 
-        public void ClearActiveSession()
+        public void CloseSession()
         {
             _current = null;
         }

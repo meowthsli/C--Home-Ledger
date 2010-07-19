@@ -2,13 +2,14 @@
 using Meowth.OperationMachine.Domain.Entities.Accounts;
 using Meowth.OperationMachine.Domain.Events;
 using Meowth.OperationMachine.Domain.Events.Transactions;
+using Meowth.OperationMachine.Domain.DomainInfrastructure;
 
 namespace Meowth.OperationMachine.Domain.Entities.Transactions
 {
     /// <summary>
     /// Accounting transaction class
     /// </summary>
-    public class AccountingTransaction : DomainEntity
+    public class AccountingTransaction : DomainEntity<AccountingTransaction>
     {
         public AccountingTransaction(string name, Account source, Account destination, decimal amount)
         {
@@ -22,7 +23,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Transactions
             Amount = amount;
             // TODO: date
 
-            Publish(new EntityCreatedEvent<AccountingTransaction>(this));
+            DomainEventBus.Route(new EntityCreatedEvent<AccountingTransaction>(this));
         }
 
         public virtual Guid Id { get; protected set; }
@@ -51,7 +52,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Transactions
             Destination.TransactCredit(Amount);
 
             IsExecuted = true;
-            Publish(new AccountingTransactionExecutedEvent(this));
+            DomainEventBus.Route(new AccountingTransactionExecutedEvent(this));
         }
 
         protected AccountingTransaction()

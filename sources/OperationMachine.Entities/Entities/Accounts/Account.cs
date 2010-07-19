@@ -2,13 +2,14 @@
 using Meowth.OperationMachine.Domain.Accounts;
 using Meowth.OperationMachine.Domain.Events;
 using Meowth.OperationMachine.Domain.Events.Accounts;
+using Meowth.OperationMachine.Domain.DomainInfrastructure;
 
 namespace Meowth.OperationMachine.Domain.Entities.Accounts
 {
     /// <summary> 
     /// Active-passive account 
     /// </summary>
-    public class Account : DomainEntity
+    public class Account : DomainEntity<Account>
     {
         public Account(string accountName)
         {
@@ -16,7 +17,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
             Name = accountName;
             PathName = AccountPathName.FromString(accountName);
 
-            Publish(new EntityCreatedEvent<Account>(this));
+            DomainEventBus.Route(new EntityCreatedEvent<Account>(this));
         }
 
         public Account(string accountName, Account parent)
@@ -25,7 +26,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
             PathName = AccountPathName.FromParentNameAndString(parent.PathName, accountName);
             Parent = parent;
 
-            Publish(new EntityCreatedEvent<Account>(this));
+            DomainEventBus.Route(new EntityCreatedEvent<Account>(this));
         }
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
         public virtual void TransactDebt(decimal amount)
         {
             DebtTurnover += amount;
-            Publish(new TurnoverEvent(TurnoverType.Debt, amount));
+            DomainEventBus.Route(new TurnoverEvent(TurnoverType.Debt, amount));
 
             if (Parent != null)
                 Parent.TransactDebt(amount);
@@ -108,7 +109,7 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
         public virtual void TransactCredit(decimal amount)
         {
             CreditTurnover += amount;
-            Publish(new TurnoverEvent(TurnoverType.Credit, amount));
+            DomainEventBus.Route(new TurnoverEvent(TurnoverType.Credit, amount));
 
             if (Parent != null)
                 Parent.TransactCredit(amount);

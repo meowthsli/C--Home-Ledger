@@ -1,4 +1,5 @@
-﻿using Meowth.OperationMachine.Domain.Accounts;
+﻿using System;
+using Meowth.OperationMachine.Domain.Accounts;
 using Meowth.OperationMachine.Domain.DomainInfrastructure.Repository;
 using Meowth.OperationMachine.Domain.Entities.Accounts;
 
@@ -33,6 +34,11 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
         public Account GetRootAccount()
         {
             return _root;
+        }
+
+        public void Save(Account accountToSave)
+        {
+            
         }
 
         #endregion

@@ -15,12 +15,11 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
         /// Sets the active ISession for the current thread. Throws exception if there's
         /// already an active ISession instance
         /// </summary>
-        /// <param name="session"></param>
-        void SetActiveSession(ISession session);
+        ISession OpenSession();
 
         /// <summary>
         /// Clears the active ISession for the current thread.
         /// </summary>
-        void ClearActiveSession();
+        void CloseSession();
     }
 }

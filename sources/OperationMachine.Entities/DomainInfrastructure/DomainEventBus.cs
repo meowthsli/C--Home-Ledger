@@ -5,28 +5,33 @@ using Meowth.OperationMachine.Domain.Events;
 
 namespace Meowth.OperationMachine.Domain.DomainInfrastructure
 {
-    public class DomainEventBus : IDomainEventBus
+    /// <summary> Event bus for domain event </summary>
+    internal static class DomainEventBus
     {
-        private IDictionary<Type, ICollection<Action<IAnyDomainEvent>>> _commonRoutes
+        private static readonly IDictionary<Type, ICollection<Action<IAnyDomainEvent>>> CommonRoutes
             = new Dictionary<Type, ICollection<Action<IAnyDomainEvent>>>();
-        
+
+        private static readonly object Locker = new object();
+
         [ThreadStatic]
         private static IDictionary<Type, ICollection<Action<IAnyDomainEvent>>> _routes;
 
-        public void Register<TEvent>(Action<TEvent> route)
+        internal static void Register<TEvent>(Action<TEvent> route)
             where TEvent : class, IAnyDomainEvent
         {
             var routingKey = typeof(TEvent);
             ICollection<Action<IAnyDomainEvent>> routes;
 
-        
-            if (!_commonRoutes.TryGetValue(routingKey, out routes))
-                _commonRoutes[routingKey] = routes = new LinkedList<Action<IAnyDomainEvent>>();
+            lock (Locker)
+            {
+                if (!CommonRoutes.TryGetValue(routingKey, out routes))
+                    CommonRoutes[routingKey] = routes = new LinkedList<Action<IAnyDomainEvent>>();
+            }
 
-            routes.Add((message) => route(message as TEvent));
-        }
+            routes.Add(message => route(message as TEvent));
+        }   
 
-        public void RegisterThreaded<TEvent>(Action<TEvent> route) where TEvent : class, IAnyDomainEvent
+        internal static void RegisterThreaded<TEvent>(Action<TEvent> route) where TEvent : class, IAnyDomainEvent
         {
             var routingKey = typeof(TEvent);
             ICollection<Action<IAnyDomainEvent>> routes;
@@ -34,25 +39,35 @@ namespace Meowth.OperationMachine.Domain.DomainInfrastructure
             if (!GetRoutes().TryGetValue(routingKey, out routes))
                 GetRoutes()[routingKey] = routes = new LinkedList<Action<IAnyDomainEvent>>();
 
-            routes.Add((message) => route(message as TEvent));
+            routes.Add(message => route(message as TEvent));
         }
 
-        private static IDictionary<Type, ICollection<Action<IAnyDomainEvent>>> GetRoutes()
+        internal static IDictionary<Type, ICollection<Action<IAnyDomainEvent>>> GetRoutes()
         {
             return _routes ?? (_routes = new Dictionary<Type, ICollection<Action<IAnyDomainEvent>>>());
         }
 
-        public void Route(IAnyDomainEvent message)
+        internal static void Route(IAnyDomainEvent message)
         {
-            ICollection<Action<IAnyDomainEvent>> routes;
+            ICollection<Action<IAnyDomainEvent>> routes = null;
 
-            if (!_commonRoutes.TryGetValue(message.GetType(), out routes))
+            lock (Locker)
             {
-                Trace.WriteLine("There is no route registered for message of type " + message.GetType());
+                ICollection<Action<IAnyDomainEvent>> r;
+                if (!CommonRoutes.TryGetValue(message.GetType(), out r))
+                {
+                    Trace.WriteLine("There is no route registered for message of type " + message.GetType());
+                }
+                else
+                {
+                    routes = new List<Action<IAnyDomainEvent>>(r);
+                }
             }
-            else
-                foreach (var route in routes)
+
+            if (routes != null)
+                foreach (var route in routes )
                     route(message);
+            
 
             if (!GetRoutes().TryGetValue(message.GetType(), out routes))
             {
@@ -63,15 +78,44 @@ namespace Meowth.OperationMachine.Domain.DomainInfrastructure
                     route(message);
         }
 
-        public void ClearThreadedSubscribers()
+        internal static void ClearThreadedSubscribers()
         {
             GetRoutes().Clear();
         }
 
-        public void ClearAllSubscribers()
+        internal static void ClearAllSubscribers()
         {
             ClearThreadedSubscribers();
-            _commonRoutes.Clear();
+            lock(Locker)
+                CommonRoutes.Clear();
+        }
+    }
+
+    public class DomainEventBusGate : IDomainEventBus
+    {
+        public void Route(IAnyDomainEvent ev)
+        {
+            DomainEventBus.Route(ev);
+        }
+
+        public void Register<TEvent>(Action<TEvent> route) where TEvent : class, IAnyDomainEvent
+        {
+            DomainEventBus.Register(route);
+        }
+
+        public void RegisterThreaded<TEvent>(Action<TEvent> route) where TEvent : class, IAnyDomainEvent
+        {
+            DomainEventBus.RegisterThreaded(route);
+        }
+
+        public void ClearThreadedSubscribers()
+        {
+            DomainEventBus.ClearThreadedSubscribers();
+        }
+
+        public void ClearAllSubscribers()
+        {
+            DomainEventBus.ClearAllSubscribers();
         }
     }
 }

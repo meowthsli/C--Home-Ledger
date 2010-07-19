@@ -1,8 +1,7 @@
-﻿using Meowth.OperationMachine.Domain.Entities.Accounts;
-
+﻿using Meowth.OperationMachine.Domain.Entities.Transactions;
 namespace Meowth.OperationMachine.Domain.Events.Accounts
 {
-    public class TurnoverEvent : DomainEvent<Account>
+    public class TurnoverEvent : DomainEvent<AccountingTransaction>
     {
         public TurnoverEvent(TurnoverType type, decimal amount)
         {

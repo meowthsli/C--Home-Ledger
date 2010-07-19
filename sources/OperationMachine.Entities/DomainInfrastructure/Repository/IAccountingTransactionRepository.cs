@@ -5,5 +5,7 @@ namespace Meowth.OperationMachine.Domain.DomainInfrastructure.Repository
     public interface IAccountingTransactionRepository
     {
         AccountingTransaction GetById(Guid id);
+
+        void Save(AccountingTransaction tx);
     }
 }

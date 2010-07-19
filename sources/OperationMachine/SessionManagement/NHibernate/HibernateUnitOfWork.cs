@@ -10,23 +10,20 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
     public class HibernateUnitOfWork : IUnitOfWork
     {
         private readonly IHibernateSessionManager _nhibernateSessionManager;
-        private readonly ISession _session;
         private readonly IDomainEventBus _eventRouter;
+        private ISession _session;
 
         /// <summary>
         /// .ctor with all dependencies
         /// </summary>
-        /// <param name="sessionFactory"></param>
         /// <param name="nhibernateSessionManager"></param>
         /// <param name="eventRouter"></param>
         public HibernateUnitOfWork(
-            ISessionFactory sessionFactory, 
             IHibernateSessionManager nhibernateSessionManager,
             IDomainEventBus eventRouter)
         {
             _nhibernateSessionManager = nhibernateSessionManager;
-            _session = sessionFactory.OpenSession();
-            _nhibernateSessionManager.SetActiveSession(_session);
+            _session = _nhibernateSessionManager.OpenSession();
 
             _eventRouter = eventRouter;
         }
@@ -42,6 +39,8 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
             _session.Dispose();
 
             _eventRouter.ClearThreadedSubscribers();
+
+            _session = null;
         }
 
         /// <summary> Creates new wrapper for hibernate transaction </summary>

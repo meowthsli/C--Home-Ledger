@@ -32,7 +32,7 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
         /// <returns></returns>
         public IUnitOfWork CreateUnitOfWork()
         {
-            return new HibernateUnitOfWork(_sessionFactory, _sessionManager, _eventRouter);
+            return new HibernateUnitOfWork(_sessionManager, _eventRouter);
         }
 
         #endregion

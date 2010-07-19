@@ -11,8 +11,7 @@ namespace Meowth.OperationMachine.Tests
         protected DomainTestFixtureBase()
         {
             Container = new UnityContainer();
-            Container.RegisterInstance<IDomainEventBus>(new DomainEventBus());
-            DomainEntity.SetEventRouter(Container.Resolve<IDomainEventBus>());
+            Container.RegisterInstance<IDomainEventBus>(new DomainEventBusGate());
         }
 
         protected UnityContainer Container { get; private set; }

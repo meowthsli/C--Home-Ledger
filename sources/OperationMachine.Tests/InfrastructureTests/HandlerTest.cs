@@ -5,7 +5,6 @@ using Microsoft.Practices.Unity;
 using NUnit.Framework;
 using Meowth.OperationMachine.SessionManagement;
 using Meowth.OperationMachine.Domain.DomainInfrastructure.Repository;
-using Meowth.OperationMachine.Domain.Entities;
 
 namespace Meowth.OperationMachine.Tests.InfrastructureTests
 {
@@ -15,18 +14,15 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
         public HandlerTest()
         {
             Container = new UnityContainer();
-            Container.RegisterType<IDomainEventBus, DomainEventBus>();
+            Container.RegisterType<IDomainEventBus, DomainEventBusGate>();
 
             Container
-                .RegisterInstance<IDomainEventBus>(new DomainEventBus())
                 .RegisterType<IUnitOfWorkFactory, TestUoWFactory>()
                 .RegisterType<IAccountRepository, TestAccountRepository>(
                     new ContainerControlledLifetimeManager())
                 .RegisterType<MakeTransactionCommandHandler, MakeTransactionCommandHandler>();
-
-            DomainEntity.SetEventRouter(Container.Resolve<IDomainEventBus>());
         }
-
+     
         [Test]
         public void TestTransactionHandler()
         {

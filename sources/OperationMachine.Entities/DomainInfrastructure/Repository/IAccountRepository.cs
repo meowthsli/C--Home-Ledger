@@ -8,5 +8,7 @@ namespace Meowth.OperationMachine.Domain.DomainInfrastructure.Repository
         Account FindByPathName(AccountPathName name);
 
         Account GetRootAccount();
+
+        void Save(Account accountToSave);
     }
 }

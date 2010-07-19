@@ -1,7 +1,6 @@
 ﻿using System;
 using Meowth.OperationMachine.Domain.DomainInfrastructure.Repository;
 using Meowth.OperationMachine.Domain.Entities.Transactions;
-using Meowth.OperationMachine.Domain.Events;
 using Meowth.OperationMachine.SessionManagement.NHibernate;
 
 namespace Meowth.OperationMachine.RepositoryImplementation
@@ -31,11 +30,11 @@ namespace Meowth.OperationMachine.RepositoryImplementation
             return _sessionManager.GetActiveSession().Get<AccountingTransaction>(id);
         }
 
-        #endregion
-
-        public void OnTransactionCreated(EntityCreatedEvent<AccountingTransaction> tx)
+        public void Save(AccountingTransaction tx)
         {
-            _sessionManager.GetActiveSession().Save(tx.Subject);
+            _sessionManager.GetActiveSession().Save(tx);
         }
+
+        #endregion
     }
 }

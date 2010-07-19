@@ -15,7 +15,6 @@ namespace Meowth.OperationMachine
         /// <summary> In-memory database construction </summary>
         public OperationMachine()
         {
-            DomainEntity.SetEventRouter(_container.Resolve<IDomainEventBus>());
         }
 
         private readonly UnityContainer _container = new UnityContainer();
