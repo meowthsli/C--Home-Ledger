@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Meowth.OperationMachine.Domain.Accounts;
 using Meowth.OperationMachine.Domain.Events;
 using Meowth.OperationMachine.Domain.Events.Accounts;
@@ -22,9 +23,11 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
 
         public Account(string accountName, Account parent)
         {
+            Id = Guid.NewGuid();
             Name = accountName;
             PathName = AccountPathName.FromParentNameAndString(parent.PathName, accountName);
             Parent = parent;
+            Level = parent.Level + 1;
 
             DomainEventBus.Route(new EntityCreatedEvent<Account>(this));
         }
@@ -39,6 +42,8 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
 
         /// <summary> Identity </summary>
         public virtual Guid Id { get; protected set; }
+
+        public virtual int Level { get; protected set; }
 
         /// <summary> Name </summary>
         public virtual string Name { get; protected set; }
@@ -86,7 +91,10 @@ namespace Meowth.OperationMachine.Domain.Entities.Accounts
 
         public virtual Account CreateSubaccountsTree(AccountPathName name)
         {
-            throw new NotImplementedException();
+            var root = this;
+            root = name.GetNameComponents().Aggregate(root, 
+                (current, component) => current.CreateSubaccount(component));
+            return root;
         }
 
         /// <summary>

@@ -13,10 +13,13 @@ namespace Meowth.OperationMachine
             Map(a => a.CreditTurnover);
             Map(a => a.DebtTurnover);
             Map(a => a.Name);
+            Map(a => a.Level);
             References(a => a.Parent);
             Component(
                 apn => apn.PathName,
                 m => m.Map(n => n.Path));
+            
+            DynamicUpdate();
         }
     }
 
@@ -31,6 +34,8 @@ namespace Meowth.OperationMachine
             References(t => t.Source).Not.Nullable();
             Map(t => t.IsExecuted);
             Map(t => t.Name);
+            
+            DynamicUpdate();
         }
     }
 }

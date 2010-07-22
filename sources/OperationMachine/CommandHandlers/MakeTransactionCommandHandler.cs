@@ -1,44 +1,29 @@
 ﻿using System;
 using Meowth.OperationMachine.Commands;
 using Meowth.OperationMachine.Domain.Accounts;
-using Meowth.OperationMachine.Domain.DomainInfrastructure;
 using Meowth.OperationMachine.Domain.DomainInfrastructure.Repository;
 using Meowth.OperationMachine.Domain.Entities.Accounts;
 using Meowth.OperationMachine.Domain.Entities.Transactions;
-using Meowth.OperationMachine.SessionManagement;
 
 namespace Meowth.OperationMachine.CommandHandlers
 {
     /// <summary>
     /// Handler for command of creation new transaction from account to account
     /// </summary>
-    public class MakeTransactionCommandHandler
+    internal class MakeTransactionCommandHandler : CommandHandler<MakeAccountingTransactionCommandDTO>
     {
         private readonly IAccountRepository _accountRepository;
-        private readonly IUnitOfWorkFactory _uowFactory;
-        private readonly IDomainEventBus _eventBus;
 
         /// <summary>
         /// Ctor with all dependencies
         /// </summary>
         /// <param name="accountRepository"></param>
-        /// <param name="uowFactory"></param>
-        /// <param name="eventBus"></param>
-        public MakeTransactionCommandHandler(
-            IAccountRepository accountRepository,
-            IUnitOfWorkFactory uowFactory,
-            IDomainEventBus eventBus)
+        public MakeTransactionCommandHandler(IAccountRepository accountRepository)
         {
-            _uowFactory = uowFactory;
-            _eventBus = eventBus;
             _accountRepository = accountRepository;
         }
 
-        /// <summary>
-        /// Executes handler
-        /// </summary>
-        /// <param name="cmd"></param>
-        public void Execute(MakeAccountingTransactionCommandDTO cmd)
+        public override void Handle(MakeAccountingTransactionCommandDTO cmd)
         {
             Account rootAccount = null;
             Func<Account> getRootAccount = () => rootAccount

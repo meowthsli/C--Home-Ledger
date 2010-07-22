@@ -33,6 +33,12 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
 
         public void CloseSession()
         {
+            if(_current == null)
+                return;
+
+            _current.Flush();
+            _current.Close();
+            _current.Dispose();
             _current = null;
         }
     }

@@ -41,25 +41,19 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
             var sessionFactory = cfg
                .BuildSessionFactory();
 
-            foreach (var md in sessionFactory.GetAllClassMetadata())
-                Trace.WriteLine(md.Key);
-
-            foreach (var md in sessionFactory.GetAllCollectionMetadata())
-                Trace.WriteLine(md.Key);
-
             new SchemaExport(cfg).Execute(true, true, false);
 
             _container
                 .RegisterInstance(sessionFactory)
                 .RegisterType<IDomainEventBus, DomainEventBusGate>()
-                .RegisterType<IHibernateSessionManager, HibernateSessionManagerImpl>(
-                    new ContainerControlledLifetimeManager())
-                .RegisterType<IAccountRepository, HibernateAccountRepository>(
-                    new ContainerControlledLifetimeManager())
-                .RegisterType<IAccountingTransactionRepository, HibernateAccountingTransactionRepository>(
-                    new ContainerControlledLifetimeManager())
-                .RegisterType<IUnitOfWorkFactory, HibernateUnitOfWorkFactory>(
-                    new ContainerControlledLifetimeManager());
+                
+                // repositories
+                .RegisterType<IAccountRepository, HibernateAccountRepository>(new ContainerControlledLifetimeManager())
+                .RegisterType<IAccountingTransactionRepository, HibernateAccountingTransactionRepository>(new ContainerControlledLifetimeManager())
+                
+                // session management
+                .RegisterType<IHibernateSessionManager, HibernateSessionManagerImpl>(new ContainerControlledLifetimeManager())
+                .RegisterType<IUnitOfWorkFactory, HibernateUnitOfWorkFactory>(new ContainerControlledLifetimeManager());
 
             _container.AddExtension(new RegistrationExtension());
         }

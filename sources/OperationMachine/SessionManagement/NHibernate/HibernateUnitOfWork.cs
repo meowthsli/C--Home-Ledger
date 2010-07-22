@@ -11,7 +11,6 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
     {
         private readonly IHibernateSessionManager _nhibernateSessionManager;
         private readonly IDomainEventBus _eventRouter;
-        private ISession _session;
 
         /// <summary>
         /// .ctor with all dependencies
@@ -23,7 +22,7 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
             IDomainEventBus eventRouter)
         {
             _nhibernateSessionManager = nhibernateSessionManager;
-            _session = _nhibernateSessionManager.OpenSession();
+            _nhibernateSessionManager.OpenSession();
 
             _eventRouter = eventRouter;
         }
@@ -31,23 +30,17 @@ namespace Meowth.OperationMachine.SessionManagement.NHibernate
         /// <summary> Killer </summary>
         public void Dispose()
         {
-            if (_session == null)
-                return;
-
-            _session.Flush();
-            _session.Close();
-            _session.Dispose();
-
+            _nhibernateSessionManager.CloseSession();
             _eventRouter.ClearThreadedSubscribers();
-
-            _session = null;
         }
 
         /// <summary> Creates new wrapper for hibernate transaction </summary>
         /// <returns></returns>
         public ITransaction CreateTransaction()
         {
-            return new HibernateTransaction(_session.BeginTransaction());
+            return new HibernateTransaction(_nhibernateSessionManager
+                .GetActiveSession()
+                .BeginTransaction());
         }
     }
 

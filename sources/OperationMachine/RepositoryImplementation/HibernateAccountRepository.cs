@@ -2,9 +2,10 @@
 using Meowth.OperationMachine.Domain.Accounts;
 using Meowth.OperationMachine.Domain.DomainInfrastructure.Repository;
 using Meowth.OperationMachine.Domain.Entities.Accounts;
-using Meowth.OperationMachine.Domain.Events;
+using System.Linq;
 using Meowth.OperationMachine.SessionManagement.NHibernate;
 using NHibernate;
+using NHibernate.Linq;
 
 namespace Meowth.OperationMachine.RepositoryImplementation
 {
@@ -24,12 +25,21 @@ namespace Meowth.OperationMachine.RepositoryImplementation
 
         public Account FindByPathName(AccountPathName name)
         {
-            throw new NotImplementedException();
+            var fullName = AccountPathName.FromParentNameAndString(GetRootAccount().PathName, name.Path);
+            var res = GetActiveSession().Linq<Account>()
+                .Where(a => a.PathName == fullName)
+                .Take(1).ToArray();
+            
+            return res.Length == 0 ? null : res[0];
         }
 
         public Account GetRootAccount()
         {
-            throw new NotImplementedException();
+            var res = GetActiveSession().Linq<Account>()
+                .Where(a => a.Level == 0)
+                .Take(1).ToArray();
+
+            return res.Length == 0? null : res[0];
         }
 
         public void Save(Account account)

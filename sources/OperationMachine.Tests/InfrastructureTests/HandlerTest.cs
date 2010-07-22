@@ -35,15 +35,8 @@ namespace Meowth.OperationMachine.Tests.InfrastructureTests
                           };
             var hndl = Container.Resolve<MakeTransactionCommandHandler>();
             
-            using (var uof = Container.Resolve<IUnitOfWorkFactory>().CreateUnitOfWork())
-            {
-                using (var tx = uof.CreateTransaction())
-                {
-                    hndl.Execute(cmd);
-                    tx.Commit();
-                }
-            }
-
+            hndl.Handle(cmd);
+            
             Assert.AreEqual(10.0, Container.Resolve<IAccountRepository>().GetRootAccount().GetTurnover());
         }
 
